@@ -1,0 +1,25 @@
+#event_base=all 
+(
+  (
+    event_simpleName = "FileWritten" 
+    AND (
+      TargetFileName = /\\Flanker_.*\\WindowsPowerShell\\v1.0\\bcrypt.dll/i 
+      OR TargetFileName = /\\WindowsPowerShell\\v1.0\\bcrypt.dll/i
+    )
+  )
+  
+  (
+    (event_simpleName = "ProcessRollup2" OR event_simpleName = "NewProcess")
+    AND (
+      CommandLine = /MareBackup/i 
+      OR ImageFileName = /compattelrunner\.exe/i
+    )
+  )
+  OR
+  (
+    event_simpleName = /NamedPipe/i 
+    AND PipeName = /FALCONFLANK/i
+  )
+)
+| table(Timestamp, ComputerName, UserName, event_simpleName, ImageFileName, TargetFileName, CommandLine, PipeName)
+| sort(field=Timestamp, order=desc)
